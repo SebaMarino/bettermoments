@@ -90,6 +90,17 @@ def _get_bunits(path):
     bunits['dgFnu'] = '{}'.format(flux_unit)
     bunits['dgdV'] = 'm/s'
 
+    # method='gaussasym'
+
+    bunits['gav0'] = 'm/s'
+    bunits['gaFnu'] = '{}'.format(flux_unit)
+    bunits['gadV1'] = 'm/s'
+    bunits['gadV2'] = 'm/s'
+    bunits['dgav0'] = 'm/s'
+    bunits['dgaFnu'] = '{}'.format(flux_unit)
+    bunits['dgadV1'] = 'm/s'
+    bunits['dgadV2'] = 'm/s'
+
     # method='gaussthick'
 
     bunits['gtv0'] = 'm/s'
@@ -136,6 +147,7 @@ def _get_bunits(path):
     # Models
 
     bunits['gaussian_model'] = '{}'.format(flux_unit)
+    bunits['gaussasym_model'] = '{}'.format(flux_unit)
     bunits['gaussthick_model'] = '{}'.format(flux_unit)
     bunits['gausshermite_model'] = '{}'.format(flux_unit)
     bunits['doublegauss_model'] = '{}'.format(flux_unit)

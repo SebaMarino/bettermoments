@@ -425,6 +425,15 @@ def main():
                                     chunks=args.processes,
                                     mcmc=None)
 
+    elif args.method == 'gaussasym':
+        from .methods import collapse_gaussasym
+        print("Using {} CPUs.".format(args.processes))
+        moments = collapse_gaussasym(velax=velax,
+                                    data=masked_data,
+                                    rms=args.rms,
+                                    chunks=args.processes,
+                                    mcmc=None)
+
     elif args.method == 'gaussthick':
         from .methods import collapse_gaussthick
         print("Using {} CPUs.".format(args.processes))

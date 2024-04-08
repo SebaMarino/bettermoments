@@ -235,6 +235,8 @@ def estimate_p0(x, y, model_function):
     if 'doublegauss' == model_function:
         v0b = np.average(x, weights=y) 
         p0 += [v0b, p0[1], y[abs(x - v0b).argmin()]]
+    elif 'gaussasym' == model_function:
+        p0 = [_estimate_x0(x, y), _estimate_dx(x, y), _estimate_dx(x, y), np.max(y)]
     elif 'gaussthick' == model_function:
         p0 += [0.5]
     elif 'gausshermite' == model_function:
@@ -307,6 +309,8 @@ def default_priors(x, y, model_function):
     priors = [_x0_prior(x), _dx_prior(x), _A_prior(y)]
     if 'multi' in model_function:
         priors += [_x0_prior(x), _dx_prior(x), _A_prior(y)]
+    elif 'gaussasym' in model_function:
+        priors =  [_x0_prior(x), _dx_prior(x), _dx_prior(x), _A_prior(y)]
     elif 'thick' in model_function:
         priors += [_tau_prior()]
     elif 'hermite' in model_function:

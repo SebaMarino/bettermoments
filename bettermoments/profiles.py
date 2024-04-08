@@ -9,7 +9,7 @@ import numpy as np
 
 def free_params(model_function):
     """Numer of free parameters in each model."""
-    return {'gaussian': 3, 'gaussian_cont': 4, 'gaussthick': 4,
+    return {'gaussian': 3, 'gaussasym': 4, 'gaussian_cont': 4, 'gaussthick': 4,
             'gaussthick_cont': 5, 'doublegauss': 6, 'doublegauss_cont': 7,
             'gausshermite': 5, 'gausshermite_cont': 6}[model_function]
 
@@ -48,6 +48,41 @@ def gaussian_cont(x, *params):
     model = gaussian(x, *params[:-1]) + params[-1]
     return model
 
+
+def gaussasym(x, *params):
+    """
+    Asymmetric Gaussian function with Doppler width.
+
+    Args:
+        x (arr): Velocity axis in [m/s].
+        params (tuple): The line center in [m/s], the line Doppler width in
+            [m/s] and the line peak in [Jy/beam].
+
+    Returns:
+        model (arr): Model spectrum in [Jy/beam].
+    """
+    assert len(params) == free_params('gaussasym')
+    # model = params[2] * np.exp(-((x - params[0]) / params[1])**2)
+    model = params[3] * np.exp(-((x - params[0]) / params[1])**2)
+    model[x>params[0]] = params[3] * np.exp(-((x[x>params[0]] - params[0]) / params[2])**2)
+    return model
+
+def gaussasym_cont(x, *params):
+    """
+    Asymmetric Gaussian function with Doppler width.
+
+    Args:
+        x (arr): Velocity axis in [m/s].
+        params (tuple): The line center in [m/s], the line Doppler width in
+            [m/s], the line peak in [Jy/beam] and the continuum offset in
+            [Jy/beam].
+
+    Returns:
+        model (arr): Model spectrum in [Jy/beam].
+    """
+    assert len(params) == free_params('gaussian_cont')
+    model = gaussasym(x, *params[:-1]) + params[-1]
+    return model
 
 def doublegauss(x, *params):
     """
@@ -213,6 +248,13 @@ def build_cube(x, moments, method):
                         v0[None, :, :],
                         dV[None, :, :],
                         Fnu[None, :, :])
+    elif method == 'gaussasym':
+        v0, dV1, dV2, Fnu = moments[::2]
+        cube = gaussasym(x[:, None, None],
+                          v0[None, :, :],
+                          dV1[None, :, :],
+                          dV2[None, :, :],
+                          Fnu[None, :, :])
     elif method == 'gaussthick':
         v0, dV, Fnu, tau = moments[::2]
         cube = gaussthick(x[:, None, None],

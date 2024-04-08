@@ -306,6 +306,35 @@ def collapse_gaussian(velax, data, rms, indices=None, chunks=1, **kwargs):
                                model_function='gaussian', indices=indices,
                                chunks=chunks, **kwargs)
 
+def collapse_gaussasym(velax, data, rms, indices=None, chunks=1, **kwargs):
+    r"""
+    Collapse the cube by fitting an asymmetric Gaussian line profile to each pixel. This
+    function is a wrapper of `collapse_analytical` which provides more
+    details about the arguments.
+
+    Args:
+        velax (ndarray): Velocity axis of the cube.
+        data (ndarray): Maksed intensity or brightness temperature array. The
+            first axis must be the velocity axis.
+        rms (float): Noise per pixel in same units as ``data``.
+        indices (Optional[list]): A list of pixels described by
+            ``(y_idx, x_idx)`` tuples to fit. If none are provided, will fit
+            all pixels.
+        chunks (Optional[int]): Split the cube into ``chunks`` sections and
+            run the fits with separate processes through
+            ``multiprocessing.pool``.
+
+    Returns:
+        ``gav0`` (`ndarray`), ``dgav0`` (`ndarray`), ``gadV1`` (`ndarray`),
+        ``dgadV1`` (`ndarray`), ``gadV2`` (`ndarray`), ``dgadV2`` (`ndarray`),
+        ``gaFnu`` (`ndarray`), ``dgaFnu`` (`ndarray`):
+            The Gaussian center, ``gav0``, the Doppler line width, ``gadV`` and
+            line peak, ``gaFnu``, all with associated uncertainties, ``dga*``.
+    """
+    return collapse_analytical(velax=velax, data=data, rms=rms,
+                               model_function='gaussasym', indices=indices,
+                               chunks=chunks, **kwargs)
+
 
 def collapse_gaussthick(velax, data, rms, indices=None, chunks=1, **kwargs):
     r"""
@@ -576,7 +605,7 @@ def collapse_width(velax, data, rms):
 def available_collapse_methods():
     """Prints the available methods for collapsing the datacube."""
     funcs = ['zeroth', 'first', 'second', 'eighth', 'ninth',
-             'maximum', 'quadratic', 'width', 'percentiles', 'gaussian',
+             'maximum', 'quadratic', 'width', 'percentiles', 'gaussian', 'gaussasym',
              'gaussthick', 'gausshermite', 'doublegauss']
     txt = 'Available methods are:\n'
     txt += '\n'
@@ -590,6 +619,7 @@ def available_collapse_methods():
     txt += '\t {:12} (effective width for a Gaussian profile)\n'
     txt += '\t {:12} (intesity weighted percentiles)\n'
     txt += '\t {:12} (gaussian fit)\n'
+    txt += '\t {:12} (gaussian with asymmetric standard deviationsfit)\n'
     txt += '\t {:12} (gaussian with optically thick core fit)\n'
     txt += '\t {:12} (gaussian-hermite expansion fit)\n'
     txt += '\t {:12} (double gaussian fit)\n'
@@ -612,6 +642,7 @@ def collapse_method_products(method):
     returns['percentiles'] = 'wp50, dwp50, wpdVb, dwpdVb, wpdVr, dwpdVr, '
     returns['percentiles'] += 'wp1684, dwp1684'
     returns['gaussian'] = 'gv0, dgv0, gdV, dgdV, gFnu, dgFnu'
+    returns['gaussasym'] = 'gav0, dgav0, gadV1, dgadV1, gadV2, dgadV2, gaFnu, dgaFnu'
     returns['gaussthick'] = 'gtv0, dgtv0, gtdV, dgtdV, gtFnu, dgtFnu, '
     returns['gaussthick'] += 'gttau, dgttau'
     returns['gausshermite'] = 'ghv0, dghv0, ghdV, dghdV, ghFnu, dghFnu, '
